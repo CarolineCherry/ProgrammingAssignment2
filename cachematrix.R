@@ -1,15 +1,50 @@
 ## Put comments here that give an overall description of what your
 ## functions do
 
-## Write a short comment describing this function
+## makeCacheMatrix: This function creates a special "matrix" object 
+## that can cache its inverse.
+
 
 makeCacheMatrix <- function(x = matrix()) {
-
+  m <- NULL
+  set <- function(y) {
+    x <<- y
+    m <<- NULL
+  }
+  get <- function() x
+  setsolve <- function(inverse) m <<- inverse
+  getsolve <- function() m
+  list(set = set, get = get,
+       setsolve = setsolve,
+       getsolve = getsolve)
 }
 
 
-## Write a short comment describing this function
+##cacheSolve: This function computes the inverse of the special 
+##"matrix" returned by makeCacheMatrix above. If the inverse has 
+#already been calculated (and the matrix has not changed), 
+##then the cachesolve should retrieve the inverse from the cache
 
 cacheSolve <- function(x, ...) {
         ## Return a matrix that is the inverse of 'x'
-}
+  m <- x$getsolve()
+  if(!is.null(m)) {
+    message("getting cached data")
+    return(m)
+  }
+  data <- x$get()
+  m <- solve(data, ...)
+  x$setsolve(m)
+  m
+}  
+
+##Test: The below tests the code above to make sure that it does
+## invert a matrix.  I created a simple matrix and then inverted it using the
+## functions above.
+
+mymatrix <- matrix(c(1,2,3,4), nrow = 2, ncol = 2, byrow = TRUE,
+                      dimnames = list(c("row1", "row2"),
+                                      c("C.1", "C.2")))
+zx <- makeCacheMatrix(mymatrix)
+cacheSolve(zx)
+
